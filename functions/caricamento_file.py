@@ -27,7 +27,7 @@ def carica_dis_susa(file_path):
     if row.iloc[4] in [3, 4]:
       cap = str(row.iloc[0]).strip()
       loc = row.iloc[1].strip()
-      prov = row.iloc[2].strip()
+      prov = str(row.iloc[2]).strip()
       localita.append((cap, loc, prov))
     
   return localita
@@ -43,3 +43,8 @@ def carica_alta_urb_susa(file_path):
     localita.append((cap, loc, prov))
   
   return localita
+
+def carica_file_fatturazione(file_path):
+  df = pd.read_excel(file_path, header=None)
+  data = df.values.tolist()
+  return data
