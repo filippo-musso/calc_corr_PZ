@@ -17,7 +17,7 @@ disagiate_susa = carica_dis_susa(file_paths["Disagiate Susa"])
 
 # Caricamento del primo file Excel
 df_tariffe = pd.read_excel(file_paths["Tariffe"])
-df_fatt = pd.read_excel(file_paths["Tariffe Aggiunta"], dtype={3: str, 7:str})
+df_fatt = pd.read_excel(file_paths["Tariffe Aggiunta"], parse_dates=[11], dtype={3: str, 7:str})
 
 # Inizializzazione della lista per i dati da scrivere nel file di output
 output_data = []
