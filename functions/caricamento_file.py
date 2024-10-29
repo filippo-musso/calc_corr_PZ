@@ -42,8 +42,3 @@ def carica_alta_urb_susa(file_path):
         localita.append((cap, loc, prov))
     
     return localita
-
-def carica_file_fatturazione(file_path):
-  df = pd.read_excel(file_path, header=None, dtype={3: str, 7:str})
-  data = df.values.tolist()
-  return data
