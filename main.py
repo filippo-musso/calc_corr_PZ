@@ -11,6 +11,25 @@ file_paths = {
     "Tariffe Aggiunta": "./ESP_FATT.xlsx"
 }
 
+nomi_clienti = {
+    903: "FM", 
+    905: "Brugarolas", 
+    908: "Cerutti", 
+    917: "SetMar",
+    921: "OilSa",
+    924: "RAM",
+    925: "AVService",
+    927: "Stellantis Lombardia",
+    934: "Maina",
+    935: "Rossi",
+    938: "IM",
+    940: "Brandini",
+    941: "EAA Oil",
+    942: "CAF",
+    944: "Stellantis Piemonte",
+    945: "Andreini"
+}
+
 # Caricamento dei dati
 disagiate_arco = carica_loc_arco(file_paths["Disagiate Arco"])
 disagiate_susa = carica_dis_susa(file_paths["Disagiate Susa"])
@@ -21,10 +40,6 @@ df_fatt = pd.read_excel(file_paths["Tariffe Aggiunta"], parse_dates=[11], dtype=
 
 # Inizializzazione della lista per i dati da scrivere nel file di output
 output_data = []
-
-# Formattazione mese corrente in italiano
-import datetime
-mese_corrente = datetime.datetime.now().strftime("%B")
 
 for index, row in df_tariffe.iterrows():
     num_doc = f"{row.iloc[0]}/{row.iloc[1]}"  # Formattazione numero/lettera
@@ -46,8 +61,6 @@ for index, row in df_tariffe.iterrows():
     # Calcolo DIS.
     for _, riga in df_fatt.iterrows():
         if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
-            tm_causale = riga['tm_causale']
-            nome_cliente = "FM" if tm_causale == 903 else "Default"  # Default o altro valore se necessario
 
             if riga['tm_coddest'] == 0:
                 cap = riga['an_cap']
@@ -73,8 +86,16 @@ for index, row in df_tariffe.iterrows():
 # Creazione del DataFrame per il file di output
 df_output = pd.DataFrame(output_data)
 
+# Ricava il mese dalla data del documenta della prima riga delfile
+data = df_fatt["tm_datadoc"].iloc[0]
+mese_fatturazione = data.strftime("%B")
+
+# Aggiunge il nome cliente in basa alla causale di magazzino, presa dalla prima riga del file
+tm_causale = df_fatt["tm_causale"].iloc[0]
+nome_cliente = nomi_clienti[tm_causale]
+
 # Salvataggio del file di output
-nome_file_output = f"Trasporto {nome_cliente} {mese_corrente}.xlsx"
+nome_file_output = f"Trasporto {nome_cliente} {mese_fatturazione}.xlsx"
 df_output.to_excel(nome_file_output, index=False)
 
 input(f"File di output creato: {nome_file_output}")
