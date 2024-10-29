@@ -33,6 +33,9 @@ nomi_clienti = {
 # Caricamento dei dati
 disagiate_arco = carica_loc_arco(file_paths["Disagiate Arco"])
 disagiate_susa = carica_dis_susa(file_paths["Disagiate Susa"])
+facchinaggio = carica_loc_arco(file_paths["Facchinaggio"])
+balneari = carica_loc_arco(file_paths["Balneari"])
+alta_urb = carica_alta_urb_susa(file_paths["Alta Urbanizzazione"])
 
 # Caricamento del primo file Excel
 df_tariffe = pd.read_excel(file_paths["Tariffe"])
