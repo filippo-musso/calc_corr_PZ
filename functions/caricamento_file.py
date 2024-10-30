@@ -32,7 +32,7 @@ def carica_dis_susa(file_path):
 
 def carica_alta_urb_susa(file_path):
     # Carica il file CSV, forzando la prima colonna come stringa
-    df = pd.read_csv(file_path, sep=';', header=None, dtype={0: str})
+    df = pd.read_csv(file_path, sep=';', header=None, dtype={1: str})
 
     localita = []
     for index, row in df.iterrows():

@@ -1,10 +1,14 @@
 import pandas as pd
+import locale
 from functions.caricamento_file import carica_loc_arco, carica_alta_urb_susa, carica_dis_susa
+
+locale.setlocale(locale.LC_TIME, 'it_IT.UTF-8')
 
 file_paths = {
     "Disagiate Arco": "./data/loc_disagiate_arco.csv",
     "Facchinaggio": "./data/loc_facchinaggio_arco.csv",
     "Balneari": "./data/loc_balneari_arco.csv",
+    "Impervie": "./data/loc_impervie_arco.csv",
     "Disagiate Susa": "./data/loc_disagiate_susa.xlsx",
     "Alta Urbanizzazione": "./data/com_prov_susa.csv",
     "Tariffe": "./Q_TARIFFE_EXCEL.xlsx",
@@ -35,6 +39,7 @@ disagiate_arco = carica_loc_arco(file_paths["Disagiate Arco"])
 disagiate_susa = carica_dis_susa(file_paths["Disagiate Susa"])
 facchinaggio = carica_loc_arco(file_paths["Facchinaggio"])
 balneari = carica_loc_arco(file_paths["Balneari"])
+impervie = carica_loc_arco(file_paths["Impervie"])
 alta_urb = carica_alta_urb_susa(file_paths["Alta Urbanizzazione"])
 
 # Caricamento del primo file Excel
@@ -46,6 +51,9 @@ output_data = []
 
 for index, row in df_tariffe.iterrows():
     num_doc = f"{row.iloc[0]}/{row.iloc[1]}"  # Formattazione numero/lettera
+    nolo = row.iloc[7]
+    tot = row.iloc[11]
+
     data_output = {
         "DOC": num_doc,
         "CLIENTE": row.iloc[2],  # Colonna 2
@@ -58,10 +66,53 @@ for index, row in df_tariffe.iterrows():
         "ESPR.": row.iloc[9],     # Colonna 9
         "TEL.": row.iloc[10],     # Colonna 10
         "DIS.": 0,                # Inizialmente a 0
-        "TOTALE": row.iloc[11]    # Colonna 12
     }
 
-    # Calcolo DIS.
+    fac = False
+    bal = False
+    imp = False
+    urb = False
+
+    for _, riga in df_fatt.iterrows():
+        if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
+            if riga['tm_coddest'] == 0:
+                cap = riga['an_cap']
+                loc = riga['an_citta']
+                prov = riga['an_prov']
+            else:
+                cap = riga['dd_capdest']
+                loc = riga['dd_locdest']
+                prov = riga['dd_prodest']
+
+            if riga['tm_vettor'] == 3:
+                if (cap, loc, prov) in facchinaggio and fac == False:
+                    fac = True
+                else: 
+                    continue
+                if (cap, loc, prov) in balneari and bal == False: 
+                    bal = True
+                else: 
+                    continue
+                if (cap, loc, prov) in impervie and imp == False:
+                    imp = True
+                else: 
+                    continue
+            if riga['tm_vettor'] == 946:
+                if (cap, loc, prov) in alta_urb and urb == False:
+                    urb = True
+                else: 
+                    continue
+
+    if fac == True:
+        data_output["FAC."] = 0
+    if bal == True:
+        data_output["BAL."] = 0
+    if imp == True:
+        data_output["IMP."] = " "
+    if urb == True:
+        data_output["URB."] = 0
+
+    # Calcolo Addebiti.
     for _, riga in df_fatt.iterrows():
         if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
 
@@ -78,10 +129,28 @@ for index, row in df_tariffe.iterrows():
                 if (cap, loc, prov) in disagiate_arco:
                     arr = row.iloc[5]  # ARR.
                     data_output["DIS."] = ((arr + 100 - 1) // 100) * 4.50  # Calcolo
+                    tot += data_output["DIS."]
+                if (cap, loc, prov) in facchinaggio and fac == True:
+                    data_output["FAC."] = ((arr + 100 - 1) // 100) * 6
+                    tot += data_output["FACC."]
+                if (cap, loc, prov) in balneari and bal == True:
+                    data_output["BAL."] = nolo * 0.15
+                    tot += data_output["BAL."]
+                if (cap, loc, prov) in impervie and imp == True:
+                    data_output["IMP."] = "IMP"
+                
+
             elif riga['tm_vettor'] == 946:
                 if (cap, loc, prov) in disagiate_susa:
                     arr = row.iloc[5]  # ARR.
                     data_output["DIS."] = ((arr + 100 - 1) // 100) * 4.50  # Calcolo
+                    tot += data_output["DIS."]
+                if (cap, loc, prov) in alta_urb and urb == True: 
+                    data_output["URB."] = ((arr + 100 - 1) // 100) * 1.2
+                    tot += data_output["URB."]
+
+            data_output["TOTALE"] = tot
+
             break  # Esci dal ciclo una volta trovato il documento
 
     output_data.append(data_output)
