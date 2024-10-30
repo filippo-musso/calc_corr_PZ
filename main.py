@@ -49,29 +49,13 @@ df_fatt = pd.read_excel(file_paths["Tariffe Aggiunta"], parse_dates=[11], dtype=
 # Inizializzazione della lista per i dati da scrivere nel file di output
 output_data = []
 
+fac = False
+bal = False
+imp = False
+urb = False
+
 for index, row in df_tariffe.iterrows():
     num_doc = f"{row.iloc[0]}/{row.iloc[1]}"  # Formattazione numero/lettera
-    nolo = row.iloc[7]
-    tot = row.iloc[11]
-
-    data_output = {
-        "DOC": num_doc,
-        "CLIENTE": row.iloc[2],  # Colonna 2
-        "REGIONE": row.iloc[3],  # Colonna 3
-        "PESO": row.iloc[4],     # Colonna 4
-        "ARR.": row.iloc[5],     # Colonna 5
-        "TAR.": row.iloc[6],     # Colonna 6
-        "NOLO": row.iloc[7],     # Colonna 7
-        "TASS.": row.iloc[8],    # Colonna 8
-        "ESPR.": row.iloc[9],     # Colonna 9
-        "TEL.": row.iloc[10],     # Colonna 10
-        "DIS.": 0,                # Inizialmente a 0
-    }
-
-    fac = False
-    bal = False
-    imp = False
-    urb = False
 
     for _, riga in df_fatt.iterrows():
         if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
@@ -85,23 +69,36 @@ for index, row in df_tariffe.iterrows():
                 prov = riga['dd_prodest']
 
             if riga['tm_vettor'] == 3:
-                if (cap, loc, prov) in facchinaggio and fac == False:
+                if (cap, loc, prov) in facchinaggio:
                     fac = True
-                else: 
-                    continue
-                if (cap, loc, prov) in balneari and bal == False: 
+                if (cap, loc, prov) in balneari: 
                     bal = True
-                else: 
-                    continue
-                if (cap, loc, prov) in impervie and imp == False:
+                if (cap, loc, prov) in impervie:
                     imp = True
-                else: 
-                    continue
             if riga['tm_vettor'] == 946:
-                if (cap, loc, prov) in alta_urb and urb == False:
+                if (cap, loc, prov) in alta_urb:
                     urb = True
-                else: 
-                    continue
+            break
+
+for index, row in df_tariffe.iterrows():
+    num_doc = f"{row.iloc[0]}/{row.iloc[1]}"  # Formattazione numero/lettera
+
+    nolo = row.iloc[7]
+    tot = row.iloc[11]
+    
+    data_output = {
+        "DOC": num_doc,
+        "CLIENTE": row.iloc[2],  # Colonna 2
+        "REGIONE": row.iloc[3],  # Colonna 3
+        "PESO": row.iloc[4],     # Colonna 4
+        "ARR.": row.iloc[5],     # Colonna 5
+        "TAR.": row.iloc[6],     # Colonna 6
+        "NOLO": round(row.iloc[7], 2),     # Colonna 7
+        "TASS.": row.iloc[8],    # Colonna 8
+        "ESPR.": row.iloc[9],     # Colonna 9
+        "TEL.": row.iloc[10],     # Colonna 10
+        "DIS.": 0,                # Inizialmente a 0
+    }
 
     if fac == True:
         data_output["FAC."] = 0
@@ -132,9 +129,9 @@ for index, row in df_tariffe.iterrows():
                     tot += data_output["DIS."]
                 if (cap, loc, prov) in facchinaggio and fac == True:
                     data_output["FAC."] = ((arr + 100 - 1) // 100) * 6
-                    tot += data_output["FACC."]
+                    tot += data_output["FAC."]
                 if (cap, loc, prov) in balneari and bal == True:
-                    data_output["BAL."] = nolo * 0.15
+                    data_output["BAL."] = round((nolo * 0.15), 2)
                     tot += data_output["BAL."]
                 if (cap, loc, prov) in impervie and imp == True:
                     data_output["IMP."] = "IMP"
@@ -149,7 +146,7 @@ for index, row in df_tariffe.iterrows():
                     data_output["URB."] = ((arr + 100 - 1) // 100) * 1.2
                     tot += data_output["URB."]
 
-            data_output["TOTALE"] = tot
+            data_output["TOTALE"] = round(tot, 2)
 
             break  # Esci dal ciclo una volta trovato il documento
 
