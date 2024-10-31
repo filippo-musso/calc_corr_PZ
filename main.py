@@ -16,22 +16,23 @@ file_paths = {
 }
 
 nomi_clienti = {
-    903: "FM", 
-    905: "Brugarolas", 
-    908: "Cerutti", 
-    917: "SetMar",
-    921: "OilSa",
-    924: "RAM",
-    925: "AVService",
-    927: "Stellantis Lombardia",
-    934: "Maina",
-    935: "Rossi",
-    938: "IM",
-    940: "Brandini",
-    941: "EAA Oil",
-    942: "CAF",
-    944: "Stellantis Piemonte",
-    945: "Andreini"
+    3: "FM", 
+    5: "Brugarolas", 
+    8: "Cerutti", 
+    7: "SetMar",
+    21: "OilSa",
+    24: "RAM",
+    25: "AVService",
+    27: "Stellantis Lombardia",
+    34: "Maina",
+    35: "Rossi",
+    38: "IM",
+    40: "Brandini",
+    41: "EAA Oil",
+    42: "CAF (FUCHS)",
+    43: "CAF (ALTRI)",
+    44: "Stellantis Piemonte",
+    45: "Andreini"
 }
 
 # Caricamento dei dati
@@ -105,7 +106,7 @@ for index, row in df_tariffe.iterrows():
     if bal == True:
         data_output["BAL."] = 0
     if imp == True:
-        data_output["IMP."] = " "
+        data_output["IMP."] = 0
     if urb == True:
         data_output["URB."] = 0
 
@@ -159,9 +160,9 @@ df_output = pd.DataFrame(output_data)
 data = df_fatt["tm_datadoc"].iloc[0]
 mese_fatturazione = data.strftime("%B")
 
-# Aggiunge il nome cliente in basa alla causale di magazzino, presa dalla prima riga del file
-tm_causale = df_fatt["tm_causale"].iloc[0]
-nome_cliente = nomi_clienti[tm_causale]
+# Aggiunge il nome cliente in basa al deposito, preso dalla prima riga del file
+tm_magaz = df_fatt["tm_magaz"].iloc[0]
+nome_cliente = nomi_clienti[tm_magaz]
 
 # Salvataggio del file di output
 nome_file_output = f"Trasporto {nome_cliente} {mese_fatturazione}.xlsx"
