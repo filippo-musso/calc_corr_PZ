@@ -59,6 +59,7 @@ for index, row in df_tariffe.iterrows():
     num_doc = f"{row.iloc[0]}/{row.iloc[1]}"  # Formattazione numero/lettera
 
     for _, riga in df_fatt.iterrows():
+        data = riga.iloc["tm_datadoc"]
         if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
             if riga['tm_coddest'] == 0:
                 cap = riga['an_cap']
@@ -72,8 +73,9 @@ for index, row in df_tariffe.iterrows():
             if riga['tm_vettor'] == 3:
                 if (cap, loc, prov) in facchinaggio:
                     fac = True
-                if (cap, loc, prov) in balneari: 
-                    bal = True
+                if data.month >= 6 and data.month <= 8:
+                    if (cap, loc, prov) in balneari: 
+                        bal = True
                 if (cap, loc, prov) in impervie:
                     imp = True
             if riga['tm_vettor'] == 946:
@@ -112,6 +114,7 @@ for index, row in df_tariffe.iterrows():
 
     # Calcolo Addebiti.
     for _, riga in df_fatt.iterrows():
+        data  = riga.iloc["tm_datadoc"]
         if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
 
             if riga['tm_coddest'] == 0:
@@ -131,9 +134,10 @@ for index, row in df_tariffe.iterrows():
                 if (cap, loc, prov) in facchinaggio and fac == True:
                     data_output["FAC."] = ((arr + 100 - 1) // 100) * 6
                     tot += data_output["FAC."]
-                if (cap, loc, prov) in balneari and bal == True:
-                    data_output["BAL."] = round((nolo * 0.15), 2)
-                    tot += data_output["BAL."]
+                if data.month >= 6 and data.month <= 8:
+                    if (cap, loc, prov) in balneari and bal == True:
+                        data_output["BAL."] = round((nolo * 0.15), 2)
+                        tot += data_output["BAL."]
                 if (cap, loc, prov) in impervie and imp == True:
                     data_output["IMP."] = "IMP"
                 
