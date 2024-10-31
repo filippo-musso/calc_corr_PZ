@@ -59,7 +59,7 @@ for index, row in df_tariffe.iterrows():
     num_doc = f"{row.iloc[0]}/{row.iloc[1]}"  # Formattazione numero/lettera
 
     for _, riga in df_fatt.iterrows():
-        data = riga.iloc["tm_datadoc"]
+        data = riga["tm_datadoc"]
         if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
             if riga['tm_coddest'] == 0:
                 cap = riga['an_cap']
@@ -114,7 +114,7 @@ for index, row in df_tariffe.iterrows():
 
     # Calcolo Addebiti.
     for _, riga in df_fatt.iterrows():
-        data  = riga.iloc["tm_datadoc"]
+        data  = riga["tm_datadoc"]
         if num_doc == f"{riga.iloc[0]}/{riga.iloc[1]}":  # Confronto con il secondo file
 
             if riga['tm_coddest'] == 0:
