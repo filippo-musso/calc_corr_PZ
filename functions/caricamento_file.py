@@ -37,7 +37,7 @@ def carica_alta_urb_susa(file_path):
     localita = []
     for index, row in df.iterrows():
         cap = row[1].strip()
-        loc = row[0].strip().strip('"')
+        loc = (row[0].strip().strip('"')).upper()
         prov = str(row[2]).strip()
         localita.append((cap, loc, prov))
     

@@ -126,9 +126,10 @@ for index, row in df_tariffe.iterrows():
                 loc = riga['dd_locdest']
                 prov = riga['dd_prodest']
 
+            arr = row.iloc[5]  # ARR.
+
             if riga['tm_vettor'] == 3:
                 if (cap, loc, prov) in disagiate_arco:
-                    arr = row.iloc[5]  # ARR.
                     data_output["DIS."] = ((arr + 100 - 1) // 100) * 4.50  # Calcolo
                     tot += data_output["DIS."]
                 if (cap, loc, prov) in facchinaggio and fac == True:
@@ -144,7 +145,6 @@ for index, row in df_tariffe.iterrows():
 
             elif riga['tm_vettor'] == 946:
                 if (cap, loc, prov) in disagiate_susa:
-                    arr = row.iloc[5]  # ARR.
                     data_output["DIS."] = ((arr + 100 - 1) // 100) * 4.50  # Calcolo
                     tot += data_output["DIS."]
                 if (cap, loc, prov) in alta_urb and urb == True: 
